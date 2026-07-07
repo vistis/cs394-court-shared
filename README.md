@@ -26,7 +26,6 @@ This is the core shared library for the Court Management System. It contains the
 - Spring Data Redis
 - Flyway Migration
 - S3 (by `software.amazon.awssdk`, version `2.46.21`)
-- Spring dotenv (by `me.paulschwarz`, version `5.1.0`)
 - Spring Boot DevTools
 - Lombok
 
@@ -71,12 +70,20 @@ public class Application {...}
 
 ## Migration
 
-> This is available on projects that import this as well.
+> Migration can only be run in this project!
+
+Before running any Flyway command, make sure to configure `flyway.conf`; specifically URL, user, and password to match the database you want to migrate to.
 
 The migration will not run automatically. It has to be manually triggered with
 
 ```bash
 mvn clean flyway:migrate
+```
+
+To clean the migration, run
+
+```bash
+mvn clean flyway:clean
 ```
 
 ### Seed
