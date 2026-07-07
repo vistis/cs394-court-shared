@@ -26,11 +26,21 @@ public class UserRole implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("userId")
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(
+        name = "user_id",
+        insertable = false,
+        updatable = false,
+        nullable = false
+    )
     private User user;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @MapsId("systemRoleId")
-    @JoinColumn(name = "system_role_id", nullable = false)
+    @JoinColumn(
+        name = "system_role_id",
+        insertable = false,
+        updatable = false,
+        nullable = false
+    )
     private SystemRole systemRole;
 }

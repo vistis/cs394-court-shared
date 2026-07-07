@@ -28,12 +28,22 @@ public class CaseJudge implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("caseId")
-    @JoinColumn(name = "case_id", nullable = false)
+    @JoinColumn(
+        name = "case_id",
+        insertable = false,
+        updatable = false,
+        nullable = false
+    )
     private Case caseEntity;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @MapsId("judgeId")
-    @JoinColumn(name = "judge_id", nullable = false)
+    @JoinColumn(
+        name = "judge_id",
+        insertable = false,
+        updatable = false,
+        nullable = false
+    )
     private Judge judgeEntity;
 
     @Column(name = "is_presiding", nullable = false)

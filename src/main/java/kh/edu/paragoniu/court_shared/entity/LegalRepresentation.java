@@ -24,14 +24,29 @@ public class LegalRepresentation implements Serializable {
     private LegalRepresentationId id = new LegalRepresentationId();
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "case_id", nullable = false)
+    @JoinColumn(
+        name = "case_id",
+        insertable = false,
+        updatable = false,
+        nullable = false
+    )
     private Case caseEntity;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "participant_id", nullable = false)
+    @JoinColumn(
+        name = "participant_id",
+        insertable = false,
+        updatable = false,
+        nullable = false
+    )
     private Participant participantEntity;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "lawyer_id", nullable = false)
+    @JoinColumn(
+        name = "lawyer_id",
+        insertable = false,
+        updatable = false,
+        nullable = false
+    )
     private Lawyer lawyerEntity;
 }

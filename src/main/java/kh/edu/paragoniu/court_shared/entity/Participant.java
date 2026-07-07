@@ -12,6 +12,8 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import tools.jackson.databind.JsonNode;
 
 @Entity
@@ -35,6 +37,7 @@ public class Participant implements Serializable {
     @Column(nullable = false)
     private String name;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "contact_info", columnDefinition = "jsonb", nullable = false)
     private JsonNode contactInfo;
 
