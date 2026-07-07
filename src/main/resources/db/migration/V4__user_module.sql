@@ -64,11 +64,11 @@ INSERT INTO role_permissions (system_role_id, system_permission_id) VALUES
 -- chief123
 -- greffier123
 INSERT INTO users (user_id, username, email, first_name, last_name, password, profile_picture_path, is_active, created_at, updated_at) VALUES
-('9a7b055e-1140-4f51-872c-ec7e4dfce905', 'admin.court', 'admin@court.gov.kh', 'Vichea', 'Sam', '$2a$12$7b9e022c82515a62983dfd8f5egdf002ebf903c9b52588ecc02df', 'profiles/users/default.jpg', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('0f1a892b-8a41-477d-bb91-ce73128912aa', 'chief.greffier', 'chief.greffier@court.gov.kh', 'Chanthou', 'Sok', '$2a$12$11fa892b8a41477dbb91ce73128912ef22fb903c9b52588ecc02df', 'profiles/users/default.jpg', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('2657220f-c267-48bf-835d-3fb97dd9ad68', 'admin.court', 'admin@court.gov.kh', 'Vichea', 'Sam', '$2a$12$7b9e022c82515a62983dfd8f5egdf002ebf903c9b52588ecc02df', 'profiles/users/default.jpg', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('53855a52-f1df-4b33-833f-c1de7a676d9d', 'chief.greffier', 'chief.greffier@court.gov.kh', 'Chanthou', 'Sok', '$2a$12$11fa892b8a41477dbb91ce73128912ef22fb903c9b52588ecc02df', 'profiles/users/default.jpg', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 ('55fb903c-9b52-588e-cc02-df84239023bb', 'greffier.one', 'greffier1@court.gov.kh', 'Norith', 'Chan', '$2a$12$22fb903c9b52588ecc02df84239023f01fa892b8a41477dbb91ce', 'profiles/users/default.jpg', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 INSERT INTO user_roles (user_id, system_role_id) VALUES
-('9a7b055e-1140-4f51-872c-ec7e4dfce905', 3),
-('0f1a892b-8a41-477d-bb91-ce73128912aa', 1),
+('2657220f-c267-48bf-835d-3fb97dd9ad68', 3),
+('53855a52-f1df-4b33-833f-c1de7a676d9d', 1),
 ('55fb903c-9b52-588e-cc02-df84239023bb', 2);

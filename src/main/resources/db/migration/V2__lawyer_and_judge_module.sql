@@ -33,14 +33,10 @@ CREATE TABLE lawyers (
 
 CREATE UNIQUE INDEX idx_lawyers_license ON lawyers(license_number);
 
-ALTER TABLE legal_representations
-ADD CONSTRAINT fk_legal_representations_lawyer
-FOREIGN KEY (lawyer_id) REFERENCES lawyers(lawyer_id) ON DELETE CASCADE;
-
 INSERT INTO judges (judge_id, first_name, last_name, license_number, profile_picture_path, is_active) VALUES
 ('4a8d011b-7140-4f51-872c-ec7e4dfce901', 'Sokha', 'Kem', 'JUD-2026-0001', 'profiles/judges/default.webp', true),
-('7b9e022c-8251-5a62-983d-fd8f5egdf002', 'Vannak', 'Chan', 'JUD-2026-0002', 'profiles/judges/default.webp', true);
+('70d52aff-e544-4b1f-ab55-95e854f342e2', 'Vannak', 'Chan', 'JUD-2026-0002', 'profiles/judges/default.webp', true);
 
 INSERT INTO lawyers (lawyer_id, first_name, last_name, license_number, profile_picture_path, firm_name, is_active) VALUES
-('11fa892b-8a41-477d-bb91-ce73128912ef', 'Bora', 'Sam', 'LAW-2026-5501', 'profiles/lawyers/default.webp', 'Phnom Penh Legal Associates', true),
-('22fb903c-9b52-588e-cc02-df84239023f0', 'Srey', 'Leak', 'LAW-2026-7702', 'profiles/lawyers/default.webp', 'Angkor Justice Law Firm', true);
+('22107eb9-4287-4b5b-9a25-3f29c60a210d', 'Bora', 'Sam', 'LAW-2026-5501', 'profiles/lawyers/default.webp', 'Phnom Penh Legal Associates', true),
+('622481e5-d08a-4204-b478-62f9a75230e3', 'Srey', 'Leak', 'LAW-2026-7702', 'profiles/lawyers/default.webp', 'Angkor Justice Law Firm', true);

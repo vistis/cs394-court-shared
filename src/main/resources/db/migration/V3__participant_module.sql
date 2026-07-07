@@ -29,6 +29,9 @@ CREATE TABLE legal_representations (
     CONSTRAINT fk_legal_representations_case FOREIGN KEY (case_id) REFERENCES cases(case_id) ON DELETE CASCADE,
     CONSTRAINT fk_legal_representations_participant FOREIGN KEY (participant_id) REFERENCES participants(participant_id) ON DELETE CASCADE
 );
+ALTER TABLE legal_representations
+ADD CONSTRAINT fk_legal_representations_lawyer
+FOREIGN KEY (lawyer_id) REFERENCES lawyers(lawyer_id) ON DELETE CASCADE;
 
 INSERT INTO participant_roles (role_name) VALUES
 ('Plaintiff'),
