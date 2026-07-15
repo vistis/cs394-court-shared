@@ -1,0 +1,2 @@
+ALTER TABLE case_assignments
+ADD COLUMN assigned_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now();
