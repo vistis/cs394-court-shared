@@ -3,6 +3,9 @@ package kh.edu.paragoniu.court_shared.repository;
 import java.util.Optional;
 import java.util.UUID;
 import kh.edu.paragoniu.court_shared.entity.User;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,4 +29,43 @@ public interface UserRepository extends JpaRepository<User, UUID> {
         "SELECT u FROM User u WHERE u.email = :email AND u.isActive = true"
     )
     Optional<User> findActiveByEmail(@Param("email") String email);
+    // Grabs user, roles, and permissions
+    // @Query(
+    //     "SELECT u FROM User u " +
+    //         "LEFT JOIN FETCH u.username WHERE u.username = :username AND u.isActive = true"
+    // )
+
+    @Query(
+        "SELECT DISTINCT u FROM User u " +
+        "LEFT JOIN FETCH u.userRoles ur " +
+        "LEFT JOIN FETCH ur.systemRole sr " +
+        "LEFT JOIN FETCH sr.rolePermissions rp " +
+        "LEFT JOIN FETCH rp.systemPermission sp " +
+        "WHERE (u.username = :usernameOrEmail OR u.email = :usernameOrEmail) AND u.isActive = true"
+    )
+    Optional<User> findAuthenticatedUserByUsernameOrEmail(
+        @Param("usernameOrEmail") String usernameOrEmail
+    );
+
+    @Query(
+        "SELECT DISTINCT u FROM User u " +
+        "LEFT JOIN FETCH u.userRoles ur " +
+        "LEFT JOIN FETCH ur.systemRole sr " +
+        "WHERE (:q IS NULL OR :q = '' " +
+        " OR LOWER(u.username) LIKE LOWER(CONCAT('%', :q, '%')) " +
+        " OR LOWER(u.firstName) LIKE LOWER(CONCAT('%', :q, '%')) " +
+        " OR LOWER(u.lastName) LIKE LOWER(CONCAT('%', :q, '%')) " +
+        " OR LOWER(u.email) LIKE LOWER(CONCAT('%', :q, '%')))"
+    )
+    Page<User> search(@Param("q") String q, Pageable pageable);
+
+    long countByIsActive(boolean isactive);
+
+    @Query(
+        "SELECT DISTINCT u FROM User u " +
+        "LEFT JOIN FETCH u.userRoles ur " +
+        "LEFT JOIN FETCH ur.systemRole sr " +
+        "WHERE u.userId = :userId"
+    )
+    Optional<User> findByIdWithRoles(@Param("userId") UUID userId);
 }

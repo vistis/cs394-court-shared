@@ -10,7 +10,9 @@ import jakarta.persistence.Table;
 import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Table(name = "role_permissions")
@@ -24,11 +26,15 @@ public class RolePermission implements Serializable {
     @EmbeddedId
     private RolePermissionId id = new RolePermissionId();
 
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("systemRoleId")
     @JoinColumn(name = "system_role_id", nullable = false)
     private SystemRole systemRole;
 
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @ManyToOne(fetch = FetchType.EAGER)
     @MapsId("systemPermissionId")
     @JoinColumn(name = "system_permission_id", nullable = false)
