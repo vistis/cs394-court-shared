@@ -26,6 +26,10 @@ import lombok.NoArgsConstructor;
             columnList = "case_number",
             unique = true
         ),
+        @Index(
+            name = "idx_cases_title",
+            columnList = "title"
+        )
     }
 )
 @Data

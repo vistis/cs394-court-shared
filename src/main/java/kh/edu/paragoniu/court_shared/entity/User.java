@@ -30,6 +30,7 @@ import lombok.ToString;
             columnList = "username",
             unique = true
         ),
+        @Index(name = "idx_users_name", columnList = "first_name, last_name"),
     }
 )
 @Data

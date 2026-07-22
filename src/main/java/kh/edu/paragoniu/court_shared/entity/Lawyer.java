@@ -22,6 +22,10 @@ import lombok.NoArgsConstructor;
             columnList = "license_number",
             unique = true
         ),
+        @Index(
+            name = "idx_lawyers_name",
+            columnList = "first_name, last_name"
+        )
     }
 )
 @Data
