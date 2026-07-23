@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.index.Indexed;
 
 @Document("documents")
 @Data
@@ -22,6 +23,7 @@ public class Documents implements Serializable {
     @Id
     private String id;
 
+    @Indexed(name = "case_id_1")
     @Field("case_id")
     private UUID caseId;
 
@@ -39,6 +41,7 @@ public class Documents implements Serializable {
     @Field("is_confidential")
     private boolean isConfidential;
 
+    @Indexed(name = "uploaded_at_1")
     @Field("uploaded_at")
     private Instant uploadedAt;
 

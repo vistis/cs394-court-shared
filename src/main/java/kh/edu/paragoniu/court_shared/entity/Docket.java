@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.index.Indexed;
 
 @Document("docket_logs")
 @Data
@@ -21,6 +22,7 @@ public class Docket implements Serializable {
     @Id
     private String id;
 
+    @Indexed(name = "case_id_1")
     @Field("case_id")
     private UUID caseId;
 
@@ -32,5 +34,6 @@ public class Docket implements Serializable {
     @Field("performed_by_id")
     private UUID performedById;
 
+    @Indexed(name = "timestamp_1")
     private Instant timestamp;
 }

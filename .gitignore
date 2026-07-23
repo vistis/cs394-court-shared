@@ -33,3 +33,5 @@ build/
 
 ### VS Code ###
 .vscode/
+src/main/resources/db/migration/V12__seed_1m_cases.sql
+src/main/resources/db/migration/seed_mongodb.js

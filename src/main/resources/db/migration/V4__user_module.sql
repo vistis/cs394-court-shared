@@ -58,7 +58,7 @@ INSERT INTO system_permissions (system_permission_id, code) VALUES
 INSERT INTO role_permissions (system_role_id, system_permission_id) VALUES
 (1, 1), (1, 3), (1, 4),
 (2, 1), (2, 3),
-(3, 1), (3, 2), (3, 3), (3, 4), (3, 5);
+(3, 5);
 
 -- admin123
 -- chief123
