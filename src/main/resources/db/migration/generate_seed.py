@@ -3,7 +3,7 @@ generate_seed.py
 ================
 Generates two seed files for the Court Management System:
 
-  V12__seed_1m_cases.sql      - PostgreSQL (Flyway migration)
+  V13__seed_1m_cases.sql      - PostgreSQL (Flyway migration)
   seed_mongodb.js             - MongoDB (mongosh script)
 
 RECORD COUNT TARGET: ~1,000,000 total
@@ -56,7 +56,7 @@ import uuid
 # ---------------------------------------------------------------------------
 # Output file names (written to the same directory as this script)
 # ---------------------------------------------------------------------------
-SQL_OUTPUT = "V12__seed_1m_cases.sql"
+SQL_OUTPUT = "V13__seed_1m_cases.sql"
 MONGO_OUTPUT = "seed_mongodb.js"
 
 # ---------------------------------------------------------------------------
