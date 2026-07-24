@@ -1,5 +1,6 @@
 package kh.edu.paragoniu.court_shared.repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import kh.edu.paragoniu.court_shared.entity.User;
@@ -48,17 +49,27 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     );
 
     @Query(
+        "SELECT u.userId FROM User u WHERE " +
+        "(:q IS NULL OR :q = '' " +
+        " OR u.username LIKE LOWER(CONCAT('%', :q, '%')) " +
+        " OR LOWER(u.firstName) LIKE LOWER(CONCAT('%', :q, '%')) " +
+        " OR LOWER(u.lastName) LIKE LOWER(CONCAT('%', :q, '%')) " +
+        " OR LOWER(u.email) LIKE LOWER(CONCAT('%', :q, '%')))" +
+        "AND (:status IS NULL OR u.isActive = :status)"
+    )
+    Page<UUID> searchUserIds(@Param("q") String q, @Param("status") Boolean status, Pageable pageable);
+
+    @Query(
         "SELECT DISTINCT u FROM User u " +
         "LEFT JOIN FETCH u.userRoles ur " +
         "LEFT JOIN FETCH ur.systemRole sr " +
-        "WHERE (:q IS NULL OR :q = '' " +
-        " OR LOWER(u.username) LIKE LOWER(CONCAT('%', :q, '%')) " +
-        " OR LOWER(u.firstName) LIKE LOWER(CONCAT('%', :q, '%')) " +
-        " OR LOWER(u.lastName) LIKE LOWER(CONCAT('%', :q, '%')) " +
-        " OR LOWER(u.email) LIKE LOWER(CONCAT('%', :q, '%')))"
+        "WHERE u.userId IN :ids"
     )
-    Page<User> search(@Param("q") String q, Pageable pageable);
+    List<User> findByIdsWithRoles(@Param("ids") List<UUID> ids);
 
+    boolean existsByUsername(String username);
+
+    boolean existsByEmail(String email);
     long countByIsActive(boolean isactive);
 
     @Query(
@@ -68,4 +79,11 @@ public interface UserRepository extends JpaRepository<User, UUID> {
         "WHERE u.userId = :userId"
     )
     Optional<User> findByIdWithRoles(@Param("userId") UUID userId);
+
+    Optional<User> findByEmail(String email);
+
+    @Query(
+        "SELECT u FROM User u WHERE u.username = :username AND u.email = :email"
+    )
+    Optional<User> findByUsernameAndEmail(@Param("username") String username, @Param("email") String email);
 }

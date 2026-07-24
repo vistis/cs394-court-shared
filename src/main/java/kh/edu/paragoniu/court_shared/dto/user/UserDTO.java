@@ -18,7 +18,8 @@ public class UserDTO {
     private String lastName;
     private String profilePicturePath;
     private boolean isActive;
-    private List<String> roles;
+    // private List<String> roles;
+    private String roles;
 
     public String getFullName() {
         return (firstName + " " + lastName).trim();
