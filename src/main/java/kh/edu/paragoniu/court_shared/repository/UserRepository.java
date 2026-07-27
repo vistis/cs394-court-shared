@@ -86,4 +86,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
         "SELECT u FROM User u WHERE u.username = :username AND u.email = :email"
     )
     Optional<User> findByUsernameAndEmail(@Param("username") String username, @Param("email") String email);
+
+    boolean existsByUserIdAndUserRolesSystemRoleIsDefaultTrue(UUID userId);
 }

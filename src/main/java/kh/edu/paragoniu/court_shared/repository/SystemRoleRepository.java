@@ -38,5 +38,7 @@ public interface SystemRoleRepository
     )
     Optional<SystemRole> findByIdWithPermissions(@Param("roleId") Integer roleId);
 
+    boolean existsBySystemRoleIdAndIsDefaultTrue(Integer systemRoleId);
+
     
 }
