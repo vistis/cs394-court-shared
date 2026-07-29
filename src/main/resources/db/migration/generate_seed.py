@@ -915,13 +915,6 @@ def generate():
     print(f"  OK  {DOCS_JSON} written")
 
     # ---- docket_logs ---------------------------------------------
-    f.write(
-        "// --------------------------------------------------------\n"
-        f"// DOCKET LOGS  ({DOCKET_COUNT:,})\n"
-        "// --------------------------------------------------------\n"
-        "print('Inserting docket_logs...');\n"
-    )
-
     with open(DOCKET_JSON, "w", encoding="utf-8") as f:
         for j in range(DOCKET_COUNT):
             cid = case_ids[j % CASES_COUNT]
