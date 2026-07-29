@@ -9,26 +9,26 @@ Generates two seed files for the Court Management System:
 RECORD COUNT TARGET: ~1,000,000 total
 --------------------------------------
 PostgreSQL (~811 k rows):
-  participant_roles extension   :       3
-  default users (named)         :       3  (+3 user_roles)
-  users                         :   3,000
-  user_roles                    :   3,000
-  lawyers                       :   2,000
-  judges                        :     500
-  participants                  :  60,000
-  cases                         : 200,000
-  case_judges                   : 200,000
-  case_participants             : ~400,000  (avg 2/case)
-  legal_representations         :  80,000
+  participant_roles extension   : 3
+  default users (named)         : 3  (+3 user_roles)
+  users                         : 3,000
+  user_roles                    : 3,000
+  lawyers                       : 2,000
+  judges                        : 500
+  participants                  : 670,000
+  cases                         : 1,000,000
+  case_judges                   : 1,000,000
+  case_participants             : ~2,000,000
+  legal_representations         : 80,000
   hearings                      : 100,000
-  dispositions                  :  80,000
-  case_assignments              :  50,000
-  appeals                       :  30,000
-  greffier_supervisions         :   2,500
+  dispositions                  : 80,000
+  case_assignments              : 50,000
+  appeals                       : 30,000
+  greffier_supervisions         : 2,500
 
 MongoDB (~220 k docs):
-  documents collection          : 120,000
-  docket_logs collection        : 100,000
+  documents collection          : 42,000
+  docket_logs collection        : 200,000
 
 GRAND TOTAL ~1,031,000+
 
@@ -378,10 +378,10 @@ def generate():
     JUDGES_COUNT = 500
     judge_ids = [str(uuid.uuid4()) for _ in range(JUDGES_COUNT)]
 
-    PART_COUNT = 60_000
+    PART_COUNT = 670_000
     part_ids = [str(uuid.uuid4()) for _ in range(PART_COUNT)]
 
-    CASES_COUNT = 200_000
+    CASES_COUNT = 1_000_000
     case_ids = [str(uuid.uuid4()) for _ in range(CASES_COUNT)]
 
     # Pre-build case metadata (so filed_at is reusable across related rows)
@@ -887,8 +887,8 @@ def generate():
             "//\n"
             "// All 120,000 document records randomly share one of these 15 paths.\n"
             "// Collections:\n"
-            "//   documents   - 120,000 docs\n"
-            "//   docket_logs - 100,000 docs\n"
+            "//   documents   - 42,000 docs\n"
+            "//   docket_logs - 200,000 docs\n"
             "// ============================================================\n\n"
             "db = db.getSiblingDB('court');\n\n"
             "// Drop existing data for a clean seed\n"
@@ -901,8 +901,8 @@ def generate():
             "db.docket_logs.createIndex({ timestamp: -1 });\n\n"
         )
 
-        DOCS_COUNT = 120_000
-        DOCKET_COUNT = 100_000
+        DOCS_COUNT = 42_000
+        DOCKET_COUNT = 200_000
         MBATCH = 500
 
         # Readable document types (match DocumentService.DOCUMENT_TYPES codes)
