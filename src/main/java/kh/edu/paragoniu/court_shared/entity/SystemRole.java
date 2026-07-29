@@ -39,6 +39,9 @@ public class SystemRole implements Serializable {
     @Column(nullable = false)
     private String name;
 
+    @Column(name= "is_default")
+    private boolean isDefault;
+
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "systemRole", fetch = FetchType.LAZY)
