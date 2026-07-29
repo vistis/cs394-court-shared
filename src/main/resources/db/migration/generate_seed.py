@@ -4,7 +4,7 @@ generate_seed.py
 Generates two seed files for the Court Management System:
 
   V13__seed_1m_cases.sql              - PostgreSQL (Flyway migration)
-  documents.json, docket_logs.json    - MongoDB (mongosh script)
+  documents.json, docket_logs.json    - MongoDB (mongoimport script)
 
 RECORD COUNT TARGET: ~1,000,000 total
 --------------------------------------
@@ -973,8 +973,14 @@ def generate():
     print()
     print("To run the MongoDB seed:")
     print(
-        "  mongoimport --db court --collection documents --file documents.json --numInsertionWorkers 4 && mongoimport --db court --collection docket_logs --file docket_logs.json --numInsertionWorkers 4"
-        "  Or: docker exec -i court_mongodb mongoimport --db court --collection documents --drop < documents.json && docker exec -i court_mongodb mongoimport --db court --collection docket_logs --drop < docket_logs.json"
+        "  mongoimport --db court \\"
+        "              --collection documents \\"
+        "              --file documents.json \\"
+        "              --drop\n"
+        "  mongoimport --db court \\"
+        "              --collection documents \\"
+        "              --file documents.json \\"
+        "              --drop"
     )
 
 
