@@ -3,8 +3,8 @@ generate_seed.py
 ================
 Generates two seed files for the Court Management System:
 
-  V13__seed_1m_cases.sql      - PostgreSQL (Flyway migration)
-  seed_mongodb.js             - MongoDB (mongosh script)
+  V13__seed_1m_cases.sql              - PostgreSQL (Flyway migration)
+  documents.json, docket_logs.json    - MongoDB (mongosh script)
 
 RECORD COUNT TARGET: ~1,000,000 total
 --------------------------------------
@@ -57,7 +57,8 @@ import uuid
 # Output file names (written to the same directory as this script)
 # ---------------------------------------------------------------------------
 SQL_OUTPUT = "V13__seed_1m_cases.sql"
-MONGO_OUTPUT = "seed_mongodb.js"
+DOCS_JSON = "documents.json"
+DOCKET_JSON = "docket_logs.json"
 
 # ---------------------------------------------------------------------------
 # Realistic Khmer/Cambodian data pools
@@ -357,7 +358,7 @@ def write_batches(f, table: str, cols: str, rows: list, size: int = 2000):
 
 def generate():
     print(f"Generating PostgreSQL seed  -> {SQL_OUTPUT}")
-    print(f"Generating MongoDB seed     -> {MONGO_OUTPUT}")
+    print(f"Generating MongoDB seed     -> {DOCS_JSON} & {DOCKET_JSON}")
 
     # ------------------------------------------------------------------
     # Pre-generate all ID pools up front for referential integrity
@@ -858,173 +859,85 @@ def generate():
         "EXHIBIT": "documents/fake_exhibit.pdf",
     }
 
-    with open(MONGO_OUTPUT, "w", encoding="utf-8") as f:
-        f.write(
-            "// ============================================================\n"
-            "// AUTO-GENERATED MONGODB SEED FILE\n"
-            "// Run:  mongosh court seed_mongodb.js\n"
-            "//   or: mongosh court seed_mongodb.js | docker exec -i court_mongodb mongosh court --quiet\n"
-            "//\n"
-            "// IMPORTANT - SHARED FAKE FILES\n"
-            "// Before browsing documents, upload these 15 small PDFs to your\n"
-            "// R2/S3 bucket (any tiny PDF will work - they are shared by all records):\n"
-            "//\n"
-            "//   documents/fake_filing.pdf\n"
-            "//   documents/fake_motion.pdf\n"
-            "//   documents/fake_continuance.pdf\n"
-            "//   documents/fake_evidence.pdf\n"
-            "//   documents/fake_disposition.pdf\n"
-            "//   documents/fake_appeal.pdf\n"
-            "//   documents/fake_affidavit.pdf\n"
-            "//   documents/fake_order.pdf\n"
-            "//   documents/fake_summons.pdf\n"
-            "//   documents/fake_subpoena.pdf\n"
-            "//   documents/fake_brief.pdf\n"
-            "//   documents/fake_exhibit.pdf\n"
-            "//   documents/fake_report.pdf\n"
-            "//   documents/fake_agreement.pdf\n"
-            "//   documents/fake_memo.pdf\n"
-            "//\n"
-            "// All 120,000 document records randomly share one of these 15 paths.\n"
-            "// Collections:\n"
-            "//   documents   - 42,000 docs\n"
-            "//   docket_logs - 200,000 docs\n"
-            "// ============================================================\n\n"
-            "db = db.getSiblingDB('court');\n\n"
-            "// Drop existing data for a clean seed\n"
-            "db.documents.drop();\n"
-            "db.docket_logs.drop();\n\n"
-            "// Indexes (match @Indexed in Java entities)\n"
-            "db.documents.createIndex({ case_id: 1 });\n"
-            "db.documents.createIndex({ uploaded_at: -1 });\n"
-            "db.docket_logs.createIndex({ case_id: 1 });\n"
-            "db.docket_logs.createIndex({ timestamp: -1 });\n\n"
-        )
+    DOCS_COUNT = 42_000
+    DOCKET_COUNT = 200_000
 
-        DOCS_COUNT = 42_000
-        DOCKET_COUNT = 200_000
-        MBATCH = 128
+    # Readable document types (match DocumentService.DOCUMENT_TYPES codes)
+    APP_DOC_TYPES = [
+        "Filing",
+        "Motion",
+        "Continuance",
+        "Evidence",
+        "Disposition",
+        "Appeal",
+    ]
+    # Map app document type -> fake file path
+    APP_DOCTYPE_TO_FAKE = {
+        "Filing": "documents/fake_filing.pdf",
+        "Motion": "documents/fake_motion.pdf",
+        "Continuance": "documents/fake_continuance.pdf",
+        "Evidence": "documents/fake_evidence.pdf",
+        "Disposition": "documents/fake_disposition.pdf",
+        "Appeal": "documents/fake_appeal.pdf",
+    }
 
-        # Readable document types (match DocumentService.DOCUMENT_TYPES codes)
-        APP_DOC_TYPES = [
-            "Filing",
-            "Motion",
-            "Continuance",
-            "Evidence",
-            "Disposition",
-            "Appeal",
-        ]
-        # Map app document type -> fake file path
-        APP_DOCTYPE_TO_FAKE = {
-            "Filing": "documents/fake_filing.pdf",
-            "Motion": "documents/fake_motion.pdf",
-            "Continuance": "documents/fake_continuance.pdf",
-            "Evidence": "documents/fake_evidence.pdf",
-            "Disposition": "documents/fake_disposition.pdf",
-            "Appeal": "documents/fake_appeal.pdf",
-        }
+    # ---- documents -----------------------------------------------\
 
-        # ---- documents -----------------------------------------------
-        f.write(
-            "// --------------------------------------------------------\n"
-            f"// DOCUMENTS  ({DOCS_COUNT:,})\n"
-            "// Each record's file_path points to one of 15 shared fake\n"
-            "// PDFs - you only need those 15 files in R2, not 120,000.\n"
-            "// --------------------------------------------------------\n"
-            "print('Inserting documents...');\n"
-        )
-        for i in range(0, DOCS_COUNT, MBATCH):
-            end = min(i + MBATCH, DOCS_COUNT)
+    with open(DOCS_JSON, "w", encoding="utf-8") as f:
+        for j in range(DOCS_COUNT):
+            cid = case_ids[j % CASES_COUNT]
+            uid = user_ids[j % USERS_COUNT]
+            dtype = random.choice(APP_DOC_TYPES)
+            fn, ln = rname()
+            title = (
+                random.choice(DOCUMENT_TITLE_TEMPLATES)
+                .replace("{name}", f"{fn} {ln}")
+                .replace("{n}", str(random.randint(1, 10)))
+            )
 
-            f.write("db.documents.insertMany([\n")
-            first = True
-
-            for j in range(i, end):
-                cid = case_ids[j % CASES_COUNT]
-                uid = user_ids[j % USERS_COUNT]
-                dtype = random.choice(APP_DOC_TYPES)
-                fake_path = APP_DOCTYPE_TO_FAKE[dtype]
-                fn, ln = rname()
-
-                title = (
-                    random.choice(DOCUMENT_TITLE_TEMPLATES)
-                    .replace("{name}", fn + " " + ln)
-                    .replace("{n}", str(random.randint(1, 10)))
-                )
-
-                uploaded = random_date(2023, 2026)
-                conf = "true" if random.random() < 0.15 else "false"
-                pages = random.randint(1, 120)
-                lang = random.choice(["en", "kh", "fr"])
-
-                doc = (
-                    "  {"
-                    f"case_id: UUID('{cid}'),"
-                    f" document_type: '{dtype}',"
-                    f" title: '{sql_esc(title)}',"
-                    f" submitted_by_id: UUID('{uid}'),"
-                    f" file_path: '{fake_path}',"
-                    f" is_confidential: {conf},"
-                    f" uploaded_at: new Date('{uploaded}'),"
-                    f" metadata: {{pages: {pages}, format: 'PDF', language: '{lang}'}}"
-                    "}"
-                )
-
-                if not first:
-                    f.write(",\n")
-                f.write(doc)
-                first = False
-
-            f.write("\n]);\n")
+            doc = {
+                "case_id": {"$uuid": cid},
+                "document_type": dtype,
+                "title": title,
+                "submitted_by_id": {"$uuid": uid},
+                "file_path": APP_DOCTYPE_TO_FAKE[dtype],
+                "is_confidential": random.random() < 0.15,
+                "uploaded_at": {"$date": random_date(2023, 2026)},
+                "metadata": {
+                    "pages": random.randint(1, 120),
+                    "format": "PDF",
+                    "language": random.choice(["en", "kh", "fr"]),
+                },
+            }
+            f.write(json.dumps(doc) + "\n")
         f.write(f"print('  OK {DOCS_COUNT:,} documents inserted');\n\n")
 
-        # ---- docket_logs ---------------------------------------------
-        f.write(
-            "// --------------------------------------------------------\n"
-            f"// DOCKET LOGS  ({DOCKET_COUNT:,})\n"
-            "// --------------------------------------------------------\n"
-            "print('Inserting docket_logs...');\n"
-        )
+    print(f"  OK  {DOCS_JSON} written")
 
-        for i in range(0, DOCKET_COUNT, MBATCH):
-            end = min(i + MBATCH, DOCKET_COUNT)
+    # ---- docket_logs ---------------------------------------------
+    f.write(
+        "// --------------------------------------------------------\n"
+        f"// DOCKET LOGS  ({DOCKET_COUNT:,})\n"
+        "// --------------------------------------------------------\n"
+        "print('Inserting docket_logs...');\n"
+    )
 
-            f.write("db.docket_logs.insertMany([\n")
-            first = True
+    with open(DOCKET_JSON, "w", encoding="utf-8") as f:
+        for j in range(DOCKET_COUNT):
+            cid = case_ids[j % CASES_COUNT]
+            uid = user_ids[j % USERS_COUNT]
+            atype = random.choice(DOCKET_ACTIVITY_TYPES)
 
-            for j in range(i, end):
-                cid = case_ids[j % CASES_COUNT]
-                uid = user_ids[j % USERS_COUNT]
-                atype = random.choice(DOCKET_ACTIVITY_TYPES)
-                desc = DOCKET_DESCRIPTIONS[atype]
-                ts = random_date(2023, 2026)
+            log = {
+                "case_id": {"$uuid": cid},
+                "activity_type": atype,
+                "description": DOCKET_DESCRIPTIONS[atype],
+                "performed_by_id": {"$uuid": uid},
+                "timestamp": {"$date": random_date(2023, 2026)},
+            }
+            f.write(json.dumps(log) + "\n")
 
-                doc = (
-                    "  {"
-                    f"case_id: UUID('{cid}'),"
-                    f" activity_type: '{atype}',"
-                    f" description: '{desc}',"
-                    f" performed_by_id: UUID('{uid}'),"
-                    f" timestamp: new Date('{ts}')"
-                    "}"
-                )
-
-                if not first:
-                    f.write(",\n")
-                f.write(doc)
-                first = False
-
-            f.write("\n]);\n")
-
-        f.write(
-            f"print('  OK {DOCKET_COUNT:,} docket_logs inserted');\n\n"
-            "// ============================================================\n"
-            "// END OF MONGODB SEED\n"
-            "// ============================================================\n"
-            "print('MongoDB seed complete. Remember to upload the 15 fake PDFs to R2!');\n"
-        )
-
-    print(f"  OK  {MONGO_OUTPUT} written")
+    print(f"  OK  {DOCKET_JSON} written")
 
     # Summary
     print()
@@ -1050,7 +963,7 @@ def generate():
     print(f"  appeals                :    30,000")
     print(f"  greffier_supervisions  :     {SUP_COUNT:,}")
     print()
-    print(f"MongoDB ({MONGO_OUTPUT}):")
+    print(f"MongoDB: {DOCS_JSON} & {DOCKET_JSON}")
     print(
         f"  documents              :   {DOCS_COUNT:,}  (all share 15 fake file paths)"
     )
@@ -1067,7 +980,8 @@ def generate():
     print()
     print("To run the MongoDB seed:")
     print(
-        "  mongosh court seed_mongodb.js | docker exec -i court_mongodb mongosh court --quiet"
+        "  mongoimport --db court --collection documents --file documents.json --numInsertionWorkers 4 && mongoimport --db court --collection docket_logs --file docket_logs.json --numInsertionWorkers 4"
+        "  Or: docker exec -i court_mongodb mongoimport --db court --collection documents --drop < documents.json && docker exec -i court_mongodb mongoimport --db court --collection docket_logs --drop < docket_logs.json"
     )
 
 
