@@ -292,6 +292,12 @@ PARTY_TYPES = ["Individual", "Corporation", "Government Entity", "NGO"]
 # Helpers
 # ---------------------------------------------------------------------------
 
+SEED_VALUE = 1997
+
+
+def deterministic_uuid() -> str:
+    return str(uuid.UUID(int=random.getrandbits(128), version=4))
+
 
 def random_date(start_year: int = 2024, end_year: int = 2026) -> str:
     start = datetime.datetime(start_year, 1, 1, 8, 0, 0)
@@ -356,7 +362,10 @@ def write_batches(f, table: str, cols: str, rows: list, size: int = 2000):
 # ===========================================================================
 
 
-def generate():
+def generate(seed_val: int = SEED_VALUE):
+    print(f"Initializing PRNG seed: {seed_val}")
+    random.seed(seed_val)
+
     print(f"Generating PostgreSQL seed  -> {SQL_OUTPUT}")
     print(f"Generating MongoDB seed     -> {DOCS_JSON} & {DOCKET_JSON}")
 
@@ -368,22 +377,22 @@ def generate():
     GREFFIER_COUNT = 2400  # role 2 = GREFFIER
     ADMIN_COUNT = 300  # role 3 = ADMINISTRATOR
 
-    user_ids = [str(uuid.uuid4()) for _ in range(USERS_COUNT)]
+    user_ids = [deterministic_uuid() for _ in range(USERS_COUNT)]
     chief_ids = user_ids[:CG_COUNT]
     greffier_ids = user_ids[CG_COUNT : CG_COUNT + GREFFIER_COUNT]
     # admin_ids  = user_ids[CG_COUNT + GREFFIER_COUNT:]  (not needed by FK)
 
     LAWYERS_COUNT = 2000
-    lawyer_ids = [str(uuid.uuid4()) for _ in range(LAWYERS_COUNT)]
+    lawyer_ids = [deterministic_uuid() for _ in range(LAWYERS_COUNT)]
 
     JUDGES_COUNT = 500
-    judge_ids = [str(uuid.uuid4()) for _ in range(JUDGES_COUNT)]
+    judge_ids = [deterministic_uuid() for _ in range(JUDGES_COUNT)]
 
     PART_COUNT = 670_000
-    part_ids = [str(uuid.uuid4()) for _ in range(PART_COUNT)]
+    part_ids = [deterministic_uuid() for _ in range(PART_COUNT)]
 
     CASES_COUNT = 1_000_000
-    case_ids = [str(uuid.uuid4()) for _ in range(CASES_COUNT)]
+    case_ids = [deterministic_uuid() for _ in range(CASES_COUNT)]
 
     # Pre-build case metadata (so filed_at is reusable across related rows)
     case_meta = []
@@ -671,7 +680,7 @@ def generate():
             start = random_date(2023, 2026)
             end2 = random_end_date(start, 1, 4)
             hr_rows.append(
-                f"('{uuid.uuid4()}', '{cid}',"
+                f"('{deterministic_uuid()}', '{cid}',"
                 f" {random.randint(1, 4)}, {random.randint(1, 5)},"
                 f" '{start}', '{end2}', '{random.choice(HEARING_STATUSES)}')"
             )
@@ -698,7 +707,7 @@ def generate():
             jid = random.choice(judge_ids)
             eff = random_date(2023, 2026)
             disp_rows.append(
-                f"('{uuid.uuid4()}', '{cid}', '{jid}',"
+                f"('{deterministic_uuid()}', '{cid}', '{jid}',"
                 f" {random.randint(1, 5)}, '{ruling()}', '{eff}')"
             )
         write_batches(
@@ -726,7 +735,9 @@ def generate():
             gid = random.choice(greffier_ids)
             cuid = random.choice(chief_ids)
             at = random_date(2023, 2026)
-            asgn_rows.append(f"('{uuid.uuid4()}', '{cid}', '{gid}', '{cuid}', '{at}')")
+            asgn_rows.append(
+                f"('{deterministic_uuid()}', '{cid}', '{gid}', '{cuid}', '{at}')"
+            )
         write_batches(
             f,
             "case_assignments",
@@ -752,7 +763,7 @@ def generate():
                 else "NULL"
             )
             app_rows.append(
-                f"('{uuid.uuid4()}', '{orig}', {new_cid},"
+                f"('{deterministic_uuid()}', '{orig}', {new_cid},"
                 f" '{random.choice(APPEAL_STATUSES)}')"
             )
         write_batches(
@@ -780,7 +791,7 @@ def generate():
         for j in range(SUP_COUNT):
             sub = shuffled_g[j]
             chief = random.choice(chief_ids)
-            sup_rows.append(f"('{uuid.uuid4()}', '{chief}', '{sub}')")
+            sup_rows.append(f"('{deterministic_uuid()}', '{chief}', '{sub}')")
         for i in range(0, len(sup_rows), 2000):
             chunk = sup_rows[i : i + 2000]
             f.write(
@@ -973,13 +984,13 @@ def generate():
     print()
     print("To run the MongoDB seed:")
     print(
-        "  mongoimport --db court \\"
-        "              --collection documents \\"
-        "              --file documents.json \\"
+        "  mongoimport --db court \\\n"
+        "              --collection documents \\\n"
+        "              --file documents.json \\\n"
         "              --drop\n"
-        "  mongoimport --db court \\"
-        "              --collection documents \\"
-        "              --file documents.json \\"
+        "  mongoimport --db court \\\n"
+        "              --collection documents \\\n"
+        "              --file documents.json \\\n"
         "              --drop"
     )
 
