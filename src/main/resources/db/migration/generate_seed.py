@@ -863,7 +863,7 @@ def generate():
             "// ============================================================\n"
             "// AUTO-GENERATED MONGODB SEED FILE\n"
             "// Run:  mongosh court seed_mongodb.js\n"
-            "//   or: Get-Content seed_mongodb.js | docker exec -i court_mongodb mongosh court --quiet\n"
+            "//   or: mongosh court seed_mongodb.js | docker exec -i court_mongodb mongosh court --quiet\n"
             "//\n"
             "// IMPORTANT - SHARED FAKE FILES\n"
             "// Before browsing documents, upload these 15 small PDFs to your\n"
@@ -903,7 +903,7 @@ def generate():
 
         DOCS_COUNT = 42_000
         DOCKET_COUNT = 200_000
-        MBATCH = 500
+        MBATCH = 128
 
         # Readable document types (match DocumentService.DOCUMENT_TYPES codes)
         APP_DOC_TYPES = [
@@ -935,23 +935,29 @@ def generate():
         )
         for i in range(0, DOCS_COUNT, MBATCH):
             end = min(i + MBATCH, DOCS_COUNT)
-            docs = []
+
+            f.write("db.documents.insertMany([\n")
+            first = True
+
             for j in range(i, end):
                 cid = case_ids[j % CASES_COUNT]
                 uid = user_ids[j % USERS_COUNT]
                 dtype = random.choice(APP_DOC_TYPES)
                 fake_path = APP_DOCTYPE_TO_FAKE[dtype]
                 fn, ln = rname()
+
                 title = (
                     random.choice(DOCUMENT_TITLE_TEMPLATES)
                     .replace("{name}", fn + " " + ln)
                     .replace("{n}", str(random.randint(1, 10)))
                 )
+
                 uploaded = random_date(2023, 2026)
                 conf = "true" if random.random() < 0.15 else "false"
                 pages = random.randint(1, 120)
-                lang = random.choice(["en", "km", "fr"])
-                docs.append(
+                lang = random.choice(["en", "kh", "fr"])
+
+                doc = (
                     "  {"
                     f"case_id: UUID('{cid}'),"
                     f" document_type: '{dtype}',"
@@ -963,7 +969,13 @@ def generate():
                     f" metadata: {{pages: {pages}, format: 'PDF', language: '{lang}'}}"
                     "}"
                 )
-            f.write("db.documents.insertMany([\n" + ",\n".join(docs) + "\n]);\n")
+
+                if not first:
+                    f.write(",\n")
+                f.write(doc)
+                first = False
+
+            f.write("\n]);\n")
         f.write(f"print('  OK {DOCS_COUNT:,} documents inserted');\n\n")
 
         # ---- docket_logs ---------------------------------------------
@@ -973,16 +985,21 @@ def generate():
             "// --------------------------------------------------------\n"
             "print('Inserting docket_logs...');\n"
         )
+
         for i in range(0, DOCKET_COUNT, MBATCH):
             end = min(i + MBATCH, DOCKET_COUNT)
-            dockets = []
+
+            f.write("db.docket_logs.insertMany([\n")
+            first = True
+
             for j in range(i, end):
                 cid = case_ids[j % CASES_COUNT]
                 uid = user_ids[j % USERS_COUNT]
                 atype = random.choice(DOCKET_ACTIVITY_TYPES)
                 desc = DOCKET_DESCRIPTIONS[atype]
                 ts = random_date(2023, 2026)
-                dockets.append(
+
+                doc = (
                     "  {"
                     f"case_id: UUID('{cid}'),"
                     f" activity_type: '{atype}',"
@@ -991,7 +1008,14 @@ def generate():
                     f" timestamp: new Date('{ts}')"
                     "}"
                 )
-            f.write("db.docket_logs.insertMany([\n" + ",\n".join(dockets) + "\n]);\n")
+
+                if not first:
+                    f.write(",\n")
+                f.write(doc)
+                first = False
+
+            f.write("\n]);\n")
+
         f.write(
             f"print('  OK {DOCKET_COUNT:,} docket_logs inserted');\n\n"
             "// ============================================================\n"
@@ -1043,7 +1067,7 @@ def generate():
     print()
     print("To run the MongoDB seed:")
     print(
-        "  Get-Content seed_mongodb.js | docker exec -i court_mongodb mongosh court --quiet"
+        "  mongosh court seed_mongodb.js | docker exec -i court_mongodb mongosh court --quiet"
     )
 
 
