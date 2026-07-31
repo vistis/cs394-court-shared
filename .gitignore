@@ -33,7 +33,10 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Miscellaneous ###
 *seed_1m_cases.sql
 seed_mongodb.js
 documents.json
 docket_logs.json
+flyway.conf
