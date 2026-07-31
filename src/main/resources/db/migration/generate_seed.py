@@ -921,7 +921,6 @@ def generate(seed_val: int = SEED_VALUE):
                 },
             }
             f.write(json.dumps(doc) + "\n")
-        f.write(f"print('  OK {DOCS_COUNT:,} documents inserted');\n\n")
 
     print(f"  OK  {DOCS_JSON} written")
 
