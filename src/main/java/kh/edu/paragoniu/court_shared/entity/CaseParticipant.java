@@ -3,6 +3,7 @@ package kh.edu.paragoniu.court_shared.entity;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
@@ -13,7 +14,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "case_participants")
+@Table(
+    name = "case_participants",
+    indexes = {
+        @Index(name = "idx_case_participants_participant_id", columnList = "participant_id")
+    }
+)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

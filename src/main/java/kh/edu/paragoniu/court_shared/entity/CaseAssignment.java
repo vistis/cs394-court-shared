@@ -22,6 +22,7 @@ import lombok.NoArgsConstructor;
     name = "case_assignments",
     indexes = {
         @Index(name = "idx_assignment_greffier_id", columnList = "greffier_id"),
+        @Index(name = "idx_case_assignments_case_id", columnList = "case_id"),
     }
 )
 @Data
