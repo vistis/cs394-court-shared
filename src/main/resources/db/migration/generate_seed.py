@@ -27,8 +27,8 @@ PostgreSQL (~811 k rows):
   greffier_supervisions         : 2,500
 
 MongoDB (~220 k docs):
-  documents collection          : 42,000
-  docket_logs collection        : 200,000
+  documents collection          : 500,000
+  docket_logs collection        : 1,000,000
 
 GRAND TOTAL ~1,031,000+
 
@@ -870,8 +870,8 @@ def generate(seed_val: int = SEED_VALUE):
         "EXHIBIT": "documents/fake_exhibit.pdf",
     }
 
-    DOCS_COUNT = 42_000
-    DOCKET_COUNT = 200_000
+    DOCS_COUNT = 500_000
+    DOCKET_COUNT = 1_000_000
 
     # Readable document types (match DocumentService.DOCUMENT_TYPES codes)
     APP_DOC_TYPES = [
