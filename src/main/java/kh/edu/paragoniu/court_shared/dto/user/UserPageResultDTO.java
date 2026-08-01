@@ -1,5 +1,6 @@
 package kh.edu.paragoniu.court_shared.dto.user;
 
+import java.io.Serializable;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserPageResultDTO {
+public class UserPageResultDTO implements Serializable {
     private List<UserDTO> users;
     private int currentPage;
     private int totalPages;
